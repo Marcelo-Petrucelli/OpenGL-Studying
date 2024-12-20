@@ -42,18 +42,19 @@ static void RenderSceneCB(){
     /****************************************************/
 
     ScaleMatrix scaleMatrix; //(variableScale)
-    RotationXMatrix rotateXMatrix(-35);
+    RotationXMatrix rotateXMatrix; //(-35)
     RotationYMatrix rotateYMatrix(variableRotation); //(variableRotation)
     RotationZMatrix rotateZMatrix;
-    TranslationMatrix translateMatrix(variableTranslation, 0.0f, 3.0f); //(variableTranslation)
-
+    TranslationMatrix translateMatrix(Vector3f(variableTranslation, 0.0f, 3.0f)); //(variableTranslation)
     Matrix4f transform = translateMatrix * rotateXMatrix * rotateYMatrix * rotateZMatrix * scaleMatrix;
 
-    ProjectionMatrix projection(90.0f, aspectRatio);
+    CameraViewMatrix camera(Vector3f(0.0f, 2.5f, -1.0f)); //(Vector3f(), Vector3f(), Vector3f(), Vector3f())
 
-    Matrix4f finalMatrix = projection * transform;
+    PerspectiveProjectionMatrix projection(90.0f, aspectRatio);
+    
+    Matrix4f WVP = projection * camera * transform;
 
-    glUniformMatrix4fv(gTransformMatrix, 1, GL_TRUE, &finalMatrix.m[0][0]);
+    glUniformMatrix4fv(gTransformMatrix, 1, GL_TRUE, &WVP.m[0][0]);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);

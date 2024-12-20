@@ -6,8 +6,8 @@
 #define ToDegree(x) (float)(((x) * 180.0f / M_PI))
 
 struct Vector2f {
-    float x;
-    float y;
+    float x = 0.0f;
+    float y = 0.0f;
 
     Vector2f(){};
 
@@ -22,19 +22,13 @@ struct Vector2f {
 };
 
 struct Vector3f {
-    float x;
-    float y;
-    float z;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
 
     Vector3f(){};
 
-    Vector3f(float _x, float _y){
-        x = _x;
-        y = _y;
-        z = 0.0;
-    }
-
-    Vector3f(float _x, float _y, float _z){
+    Vector3f(float _x, float _y, float _z = 0.0f){
         x = _x;
         y = _y;
         z = _z;
@@ -46,10 +40,10 @@ struct Vector3f {
 };
 
 struct Vector4f {
-    float x;
-    float y;
-    float z;
-    float w;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float w = 0.0f;
 
     Vector4f(){};
 

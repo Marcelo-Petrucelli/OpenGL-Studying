@@ -2,15 +2,41 @@
 
 #define InverseHalfFov(f) (float)(1.0f / tanf(ToRadian(f / 2.0f)))
 #define ZFrustonTransformRange(nZ, fZ) (float)(nZ - fZ)
+
 #define ProjectionA(nZ, fZ) (float)((- fZ - nZ) / ZFrustonTransformRange(nZ, fZ))
 #define ProjectionB(nZ, fZ) (float)((2 * nZ * fZ) / ZFrustonTransformRange(nZ, fZ))
 
-struct ProjectionMatrix : Matrix4f {
-    ProjectionMatrix(float fov, float rasterRatio, float nearClip = 1.0f, float farClip = 10.0f) : Matrix4f(
+#define UP DefaultUpVector()
+#define RIGHT DefaultRightVector()
+#define FRONT DefaultFrontVector()
+
+struct DefaultUpVector : Vector3f {
+    DefaultUpVector() : Vector3f(1.0f, 0.0f, 0.0f) {}
+};
+
+struct DefaultRightVector : Vector3f {
+    DefaultRightVector() : Vector3f(0.0f, 1.0f, 0.0f) {}
+};
+
+struct DefaultFrontVector : Vector3f {
+    DefaultFrontVector() : Vector3f(0.0f, 0.0f, 1.0f) {}
+};
+
+struct PerspectiveProjectionMatrix : Matrix4f {
+    PerspectiveProjectionMatrix(float fov, float rasterRatio, float nearClip = 1.0f, float farClip = 10.0f) : Matrix4f(
         InverseHalfFov(fov) / rasterRatio, 0.0f, 0.0f, 0.0f,
         0.0f, InverseHalfFov(fov), 0.0f, 0.0f,
         0.0f, 0.0f, ProjectionA(nearClip, farClip), ProjectionB(nearClip, farClip),
         0.0f, 0.0f, 1.0f, 0.0f
+    ){}
+};
+
+struct CameraViewMatrix : Matrix4f {
+    CameraViewMatrix(Vector3f pos = Vector3f(), Vector3f u = UP, Vector3f v = RIGHT, Vector3f n = FRONT) : Matrix4f(
+        u.x, u.y, u.z, -pos.x,
+        v.x, v.y, v.z, -pos.y,
+        n.x, n.y, n.z, -pos.z,
+        0.0f, 0.0f, 0.0f, 1.0f
     ){}
 };
 
@@ -53,10 +79,10 @@ struct RotationZMatrix : Matrix4f {
 };
 
 struct TranslationMatrix : Matrix4f {
-    TranslationMatrix(float offsetX = 0.0f, float offsetY = 0.0f, float offsetZ = 0.0f) : Matrix4f(
-        1.0f, 0.0f, 0.0f, offsetX,
-        0.0f, 1.0f, 0.0f, offsetY,
-        0.0f, 0.0f, 1.0f, offsetZ,
+    TranslationMatrix(Vector3f offset = 0.0f) : Matrix4f(
+        1.0f, 0.0f, 0.0f, offset.x,
+        0.0f, 1.0f, 0.0f, offset.y,
+        0.0f, 0.0f, 1.0f, offset.z,
         0.0f, 0.0f, 0.0f, 1.0f
     ) {}
 };
