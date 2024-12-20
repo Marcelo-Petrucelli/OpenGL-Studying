@@ -1,9 +1,26 @@
+#ifndef DEV_MATH_H
+#define DEV_MATH_H
+
 #define _USE_MATH_DEFINES
+#include <cstdint>
 #include <math.h>
-#include <dev_utils.h>
+
+#include "m_utils.h"
 
 #define ToRadian(x) (float)(((x) * M_PI / 180.0f))
 #define ToDegree(x) (float)(((x) * 180.0f / M_PI))
+
+//https://en.wikipedia.org/wiki/Fast_inverse_square_root
+static float Q_rsqrt(float number) {
+    union {
+        float    f;
+        uint32_t i;
+    } conv = { .f = number };
+
+    conv.i  = 0x5f3759df - (conv.i >> 1);
+    conv.f *= 1.5F - (number * 0.5F * conv.f * conv.f);
+    return conv.f;
+}
 
 struct Vector2f {
     float x = 0.0f;
@@ -18,6 +35,45 @@ struct Vector2f {
 
     Vector2f(float _all) {
         x = y = _all;
+    }
+
+    void normalize () {
+        float invMod = Q_rsqrt(x*x + y*y);
+        x = x*invMod;
+        y = y*invMod;
+    }
+
+    inline Vector2f operator + (const Vector2f& other) const {
+        Vector2f result(*this);  // Copy.
+        return result += other;
+    }
+
+    inline Vector2f operator += (const Vector2f& other) {
+        x += other.x;
+        y += other.y;
+        return *this;
+    }
+
+    inline Vector2f operator - (const Vector2f& other) const {
+        Vector2f result(*this);  // Copy.
+        return result -= other;
+    }
+
+    inline Vector2f operator -= (const Vector2f& other) {
+        x -= other.x;
+        y -= other.y;
+        return *this;
+    }
+
+    inline Vector2f operator * (const float scalar) const {
+        Vector2f result(*this);  // Copy.
+        return result *= scalar;
+    }
+
+    inline Vector2f operator *= (const float scalar) {
+        x *= scalar;
+        y *= scalar;
+        return *this;
     }
 };
 
@@ -36,6 +92,53 @@ struct Vector3f {
 
     Vector3f(float _all) {
         x = y = z = _all;
+    }
+
+    Vector3f cross (const Vector3f other) {
+        return Vector3f((y*other.z) - (z*other.y), (z*other.x) - (x*other.z), (x*other.y) - (y*other.x));
+    }
+
+    void normalize () {
+        float invMod = Q_rsqrt(x*x + y*y + z*z);
+        x = x*invMod;
+        y = y*invMod;
+        z = z*invMod;
+    }
+
+    inline Vector3f operator + (const Vector3f& other) const {
+        Vector3f result(*this);  // Copy.
+        return result += other;
+    }
+
+    inline Vector3f operator += (const Vector3f& other) {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+        return *this;
+    }
+
+    inline Vector3f operator - (const Vector3f& other) const {
+        Vector3f result(*this);  // Copy.
+        return result -= other;
+    }
+
+    inline Vector3f operator -= (const Vector3f& other) {
+        x -= other.x;
+        y -= other.y;
+        z -= other.z;
+        return *this;
+    }
+
+    inline Vector3f operator * (const float scalar) const {
+        Vector3f result(*this);  // Copy.
+        return result *= scalar;
+    }
+
+    inline Vector3f operator *= (const float scalar) {
+        x *= scalar;
+        y *= scalar;
+        z *= scalar;
+        return *this;
     }
 };
 
@@ -56,6 +159,53 @@ struct Vector4f {
 
     Vector4f(float _all) {
         x = y = z = w = _all;
+    }
+
+    void normalize () {
+        float invMod = Q_rsqrt(x*x + y*y + z*z + w*w);
+        x = x*invMod;
+        y = y*invMod;
+        z = z*invMod;
+        w = w*invMod;
+    }
+
+    inline Vector4f operator + (const Vector4f& other) const {
+        Vector4f result(*this);  // Copy.
+        return result += other;
+    }
+
+    inline Vector4f operator += (const Vector4f& other) {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+        w += other.w;
+        return *this;
+    }
+
+    inline Vector4f operator - (const Vector4f& other) const {
+        Vector4f result(*this);  // Copy.
+        return result -= other;
+    }
+
+    inline Vector4f operator -= (const Vector4f& other) {
+        x -= other.x;
+        y -= other.y;
+        z -= other.z;
+        w -= other.w;
+        return *this;
+    }
+
+    inline Vector4f operator * (const float scalar) const {
+        Vector4f result(*this);  // Copy.
+        return result *= scalar;
+    }
+
+    inline Vector4f operator *= (const float scalar) {
+        x *= scalar;
+        y *= scalar;
+        z *= scalar;
+        w *= scalar;
+        return *this;
     }
 };
 
@@ -102,3 +252,5 @@ struct Matrix4f {
         return ret;
     }
 };
+
+#endif

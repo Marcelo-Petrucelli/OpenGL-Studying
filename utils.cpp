@@ -1,5 +1,4 @@
-#include <fstream>
-#include <dev_utils.h>
+#include "m_utils.h"
 
 bool ReadFile(const char* fileName, std::string& outFile){
     std::ifstream f(fileName);
