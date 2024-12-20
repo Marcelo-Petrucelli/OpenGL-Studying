@@ -5,6 +5,7 @@
 #include <GL/freeglut.h>
 #include <dev_graphics.h>
 
+float aspectRatio;
 GLuint vertexBuffer, indexBuffer;
 GLint gTransformMatrix;
 
@@ -35,7 +36,7 @@ static void RenderSceneCB(){
     static float translationDelta = 0.005f;
 
     variableTranslation += translationDelta;
-    if((variableTranslation >= 0.5f) || (variableTranslation <= -0.5f)){
+    if((variableTranslation >= 1.5f) || (variableTranslation <= -1.5f)){
         translationDelta *= -1.0f;
     }
     /****************************************************/
@@ -44,11 +45,11 @@ static void RenderSceneCB(){
     RotationXMatrix rotateXMatrix(-35);
     RotationYMatrix rotateYMatrix(variableRotation); //(variableRotation)
     RotationZMatrix rotateZMatrix;
-    TranslationMatrix translateMatrix(0.0f, 0.0f, 3.0f); //(variableTranslation)
+    TranslationMatrix translateMatrix(variableTranslation, 0.0f, 3.0f); //(variableTranslation)
 
     Matrix4f transform = translateMatrix * rotateXMatrix * rotateYMatrix * rotateZMatrix * scaleMatrix;
 
-    ProjectionMatrix projection(90.0f);
+    ProjectionMatrix projection(90.0f, aspectRatio);
 
     Matrix4f finalMatrix = projection * transform;
 
@@ -211,8 +212,9 @@ int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
 
-    int width = 900;
-    int height = 900;
+    float width = 1500.0f;
+    float height = 900.0f;
+    aspectRatio = width/height;
     glutInitWindowSize(width, height);
 
     int x = (2560/2)-(width/2);

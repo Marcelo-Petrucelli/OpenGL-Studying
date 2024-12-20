@@ -1,12 +1,15 @@
 #include <dev_math.h>
 
 #define InverseHalfFov(f) (float)(1.0f / tanf(ToRadian(f / 2.0f)))
+#define ZFrustonTransformRange(nZ, fZ) (float)(nZ - fZ)
+#define ProjectionA(nZ, fZ) (float)((- fZ - nZ) / ZFrustonTransformRange(nZ, fZ))
+#define ProjectionB(nZ, fZ) (float)((2 * nZ * fZ) / ZFrustonTransformRange(nZ, fZ))
 
 struct ProjectionMatrix : Matrix4f {
-    ProjectionMatrix(float fov) : Matrix4f(
-        InverseHalfFov(fov), 0.0f, 0.0f, 0.0f,
+    ProjectionMatrix(float fov, float rasterRatio, float nearClip = 1.0f, float farClip = 10.0f) : Matrix4f(
+        InverseHalfFov(fov) / rasterRatio, 0.0f, 0.0f, 0.0f,
         0.0f, InverseHalfFov(fov), 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, ProjectionA(nearClip, farClip), ProjectionB(nearClip, farClip),
         0.0f, 0.0f, 1.0f, 0.0f
     ){}
 };
