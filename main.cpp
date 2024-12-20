@@ -4,21 +4,28 @@
 #include <dev_math.h>
 
 GLuint VBO;
-GLint gScaleLocation;
+GLint gTransformLocation;
 const char* vertexShaderFileName = "shaders/shader.vs";
 const char* fragmentShaderFileName = "shaders/shader.fs"; 
 
 static void RenderSceneCB(){
     glClear(GL_COLOR_BUFFER_BIT);
 
-    static float scale = 0.0f;
-    static float delta = 0.005f;
+    static float scale = 0.75f;
+    static float delta = 0.001f;
 
     scale += delta;
-    if((scale >= 1.0f) || (scale <= -1.0f)){
+    if((scale >= 0.8f) || (scale <= 0.5f)){
         delta *= -1.0f;
     }
-    glUniform1f(gScaleLocation, scale);
+
+    Matrix4f translation(
+        scale, 0.0f, 0.0f, 0.0f,
+        0.0f, scale, 0.0f, 0.0f,
+        0.0f, 0.0f, scale, 0.0,
+        0.0f, 0.0f, 0.0f, 1.0f
+    );
+    glUniformMatrix4fv(gTransformLocation, 1, GL_TRUE, &translation.m[0][0]);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
@@ -27,7 +34,7 @@ static void RenderSceneCB(){
         glDrawArrays(GL_TRIANGLES, 0, 3);
     glDisableVertexAttribArray(0);
 
-    //glutPostRedisplay();
+    glutPostRedisplay();
     glutSwapBuffers();
 }
 
@@ -37,9 +44,9 @@ static void CreateVertexBuffer(){
     //glCullFace(GL_FRONT);
 
     Vector3f vertices[3];
-    vertices[0] = Vector3f(1.0f, -1.0f, 0.0f);
-    vertices[1] = Vector3f(0.0f, 1.0f, 0.0f);
-    vertices[2] = Vector3f(-1.0f, -1.0f, 0.0f);
+    vertices[0] = Vector3f(1.0f, -1.0f, 0.0f); //Bottom right
+    vertices[1] = Vector3f(0.0f, 1.0f, 0.0f); //Center
+    vertices[2] = Vector3f(-1.0f, -1.0f, 0.0f); //Bottom left
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -115,9 +122,11 @@ static void CompileShaders(){
         exit(1);
     }
 
-    gScaleLocation = glGetUniformLocation(shaderProgramHandle, "gScale");
-    if(gScaleLocation == -1){
-        fprintf(stderr, "Error while fetching uniform location of %s\n", "gScale");
+    gTransformLocation = glGetUniformLocation(shaderProgramHandle, "gTransform");
+    if(gTransformLocation == -1){
+        fprintf(stderr, "Error while fetching uniform location of %s\n", "gTransform");
+        getchar();
+        exit(1);
     }
 
     glValidateProgram(shaderProgramHandle);
@@ -138,8 +147,8 @@ int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
 
-    int width = 1920;
-    int height = 1080;
+    int width = 960;
+    int height = 800;
     glutInitWindowSize(width, height);
 
     int x = 0;
