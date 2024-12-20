@@ -1,10 +1,13 @@
 #include <iostream>
+#include <cstdlib>
+#include <unistd.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-#include <dev_math.h>
+#include <dev_graphics.h>
 
-GLuint VBO;
+GLuint vertexBuffer, indexBuffer;
 GLint gTransformLocation;
+
 const char* vertexShaderFileName = "shaders/shader.vs";
 const char* fragmentShaderFileName = "shaders/shader.fs"; 
 
@@ -27,12 +30,19 @@ static void RenderSceneCB(){
     );
     glUniformMatrix4fv(gTransformLocation, 1, GL_TRUE, &translation.m[0][0]);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 
     glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), 0);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void *)(3 * sizeof(float)));
+
+    glDrawElements(GL_TRIANGLES, 18 * 3, GL_UNSIGNED_INT, 0);
+
     glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
 
     glutPostRedisplay();
     glutSwapBuffers();
@@ -43,14 +53,65 @@ static void CreateVertexBuffer(){
     //glFrontFace(GL_CW);
     //glCullFace(GL_FRONT);
 
-    Vector3f vertices[3];
-    vertices[0] = Vector3f(1.0f, -1.0f, 0.0f); //Bottom right
-    vertices[1] = Vector3f(0.0f, 1.0f, 0.0f); //Center
-    vertices[2] = Vector3f(-1.0f, -1.0f, 0.0f); //Bottom left
+    Vertex vertices[19];
 
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    vertices[0] = Vertex(Vector3f(0.0f, 0.0f)); //Center
+
+    vertices[1] = Vertex(Vector3f(-1.00f, 1.0f));
+    vertices[2] = Vertex(Vector3f(-0.75f, 1.0f));
+    vertices[3] = Vertex(Vector3f(-0.50f, 1.0f));
+    vertices[4] = Vertex(Vector3f(-0.25f, 1.0f));
+    vertices[5] = Vertex(Vector3f( 0.00f, 1.0f));
+    vertices[6] = Vertex(Vector3f( 0.25f, 1.0f));
+    vertices[7] = Vertex(Vector3f( 0.50f, 1.0f));
+    vertices[8] = Vertex(Vector3f( 0.75f, 1.0f));
+    vertices[9] = Vertex(Vector3f( 1.00f, 1.0f));
+
+    vertices[10] = Vertex(Vector3f(-1.00f, -1.0f));
+    vertices[11] = Vertex(Vector3f(-0.75f, -1.0f));
+    vertices[12] = Vertex(Vector3f(-0.50f, -1.0f));
+    vertices[13] = Vertex(Vector3f(-0.25f, -1.0f));
+    vertices[14] = Vertex(Vector3f( 0.00f, -1.0f));
+    vertices[15] = Vertex(Vector3f( 0.25f, -1.0f));
+    vertices[16] = Vertex(Vector3f( 0.50f, -1.0f));
+    vertices[17] = Vertex(Vector3f( 0.75f, -1.0f));
+    vertices[18] = Vertex(Vector3f( 1.00f, -1.0f));
+
+    glGenBuffers(1, &vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+}
+
+static void CreateIndexBuffer(){
+    unsigned int indices[] = {
+        //Top Triangles
+        0,2,1,
+        0,3,2,
+        0,4,3,
+        0,5,4,
+        0,6,5,
+        0,7,6,
+        0,8,7,
+        0,9,8,
+
+        //Bottom Triangle
+        0,10,11,
+        0,11,12,
+        0,12,13,
+        0,13,14,
+        0,14,15,
+        0,15,16,
+        0,16,17,
+        0,17,18,
+
+        //Side Triangles
+        0,1,10,
+        0,18,9
+    };
+
+    glGenBuffers(1, &indexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 }
 
 static void AddShader(GLuint shaderProgramHandle, const char* shaderCode, GLenum shaderType){
@@ -144,15 +205,17 @@ static void CompileShaders(){
 }
 
 int main(int argc, char **argv) {
+    srand(getpid());
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
 
-    int width = 960;
+    int width = 1200;
     int height = 800;
     glutInitWindowSize(width, height);
 
-    int x = 0;
-    int y = 0;
+    int x = (2560/2)-(1200/2);
+    int y = (1080/2)-(800/2);
     glutInitWindowPosition(x, y);
 
     int winID = glutCreateWindow("OpenGL Learning");
@@ -168,6 +231,8 @@ int main(int argc, char **argv) {
     glClearColor(Red, Green, Blue, Alpha);
 
     CreateVertexBuffer();
+    CreateIndexBuffer();
+
     CompileShaders();
 
     glutDisplayFunc(RenderSceneCB);
