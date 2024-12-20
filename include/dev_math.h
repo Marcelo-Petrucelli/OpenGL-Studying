@@ -1,4 +1,9 @@
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <dev_utils.h>
+
+#define ToRadian(x) (float)(((x) * M_PI / 180.0f))
+#define ToDegree(x) (float)(((x) * 180.0f / M_PI))
 
 struct Vector2f {
     float x;
@@ -76,4 +81,30 @@ struct Matrix4f {
         m[2][0] = a20; m[2][1] = a21; m[2][2] = a22; m[2][3] = a23;
         m[3][0] = a30; m[3][1] = a31; m[3][2] = a32; m[3][3] = a33;
     };
+
+    inline Matrix4f operator * (const Matrix4f& right) const {
+        Matrix4f ret;
+
+        ret.m[0][0] = (m[0][0] * right.m[0][0]) + (m[0][1] * right.m[1][0]) + (m[0][2] * right.m[2][0]) + (m[0][3] * right.m[3][0]);
+        ret.m[0][1] = (m[0][0] * right.m[0][1]) + (m[0][1] * right.m[1][1]) + (m[0][2] * right.m[2][1]) + (m[0][3] * right.m[3][1]);
+        ret.m[0][2] = (m[0][0] * right.m[0][2]) + (m[0][1] * right.m[1][2]) + (m[0][2] * right.m[2][2]) + (m[0][3] * right.m[3][2]);
+        ret.m[0][3] = (m[0][0] * right.m[0][3]) + (m[0][1] * right.m[1][3]) + (m[0][2] * right.m[2][3]) + (m[0][3] * right.m[3][3]);
+
+        ret.m[1][0] = (m[1][0] * right.m[0][0]) + (m[1][1] * right.m[1][0]) + (m[1][2] * right.m[2][0]) + (m[1][3] * right.m[3][0]);
+        ret.m[1][1] = (m[1][0] * right.m[0][1]) + (m[1][1] * right.m[1][1]) + (m[1][2] * right.m[2][1]) + (m[1][3] * right.m[3][1]); 
+        ret.m[1][2] = (m[1][0] * right.m[0][2]) + (m[1][1] * right.m[1][2]) + (m[1][2] * right.m[2][2]) + (m[1][3] * right.m[3][2]); 
+        ret.m[1][3] = (m[1][0] * right.m[0][3]) + (m[1][1] * right.m[1][3]) + (m[1][2] * right.m[2][3]) + (m[1][3] * right.m[3][3]);
+
+        ret.m[2][0] = (m[2][0] * right.m[0][0]) + (m[2][1] * right.m[1][0]) + (m[2][2] * right.m[2][0]) + (m[2][3] * right.m[3][0]); 
+        ret.m[2][1] = (m[2][0] * right.m[0][1]) + (m[2][1] * right.m[1][1]) + (m[2][2] * right.m[2][1]) + (m[2][3] * right.m[3][1]); 
+        ret.m[2][2] = (m[2][0] * right.m[0][2]) + (m[2][1] * right.m[1][2]) + (m[2][2] * right.m[2][2]) + (m[2][3] * right.m[3][2]); 
+        ret.m[2][3] = (m[2][0] * right.m[0][3]) + (m[2][1] * right.m[1][3]) + (m[2][2] * right.m[2][3]) + (m[2][3] * right.m[3][3]);
+
+        ret.m[3][0] = (m[3][0] * right.m[0][0]) + (m[3][1] * right.m[1][0]) + (m[3][2] * right.m[2][0]) + (m[3][3] * right.m[3][0]); 
+        ret.m[3][1] = (m[3][0] * right.m[0][1]) + (m[3][1] * right.m[1][1]) + (m[3][2] * right.m[2][1]) + (m[3][3] * right.m[3][1]); 
+        ret.m[3][2] = (m[3][0] * right.m[0][2]) + (m[3][1] * right.m[1][2]) + (m[3][2] * right.m[2][2]) + (m[3][3] * right.m[3][2]); 
+        ret.m[3][3] = (m[3][0] * right.m[0][3]) + (m[3][1] * right.m[1][3]) + (m[3][2] * right.m[2][3]) + (m[3][3] * right.m[3][3]);
+
+        return ret;
+    }
 };

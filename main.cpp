@@ -6,7 +6,7 @@
 #include <dev_graphics.h>
 
 GLuint vertexBuffer, indexBuffer;
-GLint gTransformLocation;
+GLint gTransformMatrix;
 
 const char* vertexShaderFileName = "shaders/shader.vs";
 const char* fragmentShaderFileName = "shaders/shader.fs"; 
@@ -14,21 +14,45 @@ const char* fragmentShaderFileName = "shaders/shader.fs";
 static void RenderSceneCB(){
     glClear(GL_COLOR_BUFFER_BIT);
 
-    static float scale = 0.75f;
-    static float delta = 0.001f;
+    /*********************** TEMP ***********************/
+    static float variableScale = 0.5f;
+    static float scaleDelta = 0.001f;
 
-    scale += delta;
-    if((scale >= 0.8f) || (scale <= 0.5f)){
-        delta *= -1.0f;
+    variableScale += scaleDelta;
+    if((variableScale >= 0.6f) || (variableScale <= 0.3f)){
+        scaleDelta *= -1.0f;
     }
 
-    Matrix4f translation(
-        scale, 0.0f, 0.0f, 0.0f,
-        0.0f, scale, 0.0f, 0.0f,
-        0.0f, 0.0f, scale, 0.0,
-        0.0f, 0.0f, 0.0f, 1.0f
-    );
-    glUniformMatrix4fv(gTransformLocation, 1, GL_TRUE, &translation.m[0][0]);
+    static float variableRotation = 0.0f;
+    static float rotationDelta = 0.5f;
+
+    variableRotation += rotationDelta;
+    if(variableRotation >= 360.0f){
+        variableRotation = 0.0f;
+    }
+
+    static float variableTranslation = 0.0f;
+    static float translationDelta = 0.005f;
+
+    variableTranslation += translationDelta;
+    if((variableTranslation >= 0.5f) || (variableTranslation <= -0.5f)){
+        translationDelta *= -1.0f;
+    }
+    /****************************************************/
+
+    ScaleMatrix scaleMatrix; //(variableScale)
+    RotationXMatrix rotateXMatrix(-35);
+    RotationYMatrix rotateYMatrix(variableRotation); //(variableRotation)
+    RotationZMatrix rotateZMatrix;
+    TranslationMatrix translateMatrix(0.0f, 0.0f, 3.0f); //(variableTranslation)
+
+    Matrix4f transform = translateMatrix * rotateXMatrix * rotateYMatrix * rotateZMatrix * scaleMatrix;
+
+    ProjectionMatrix projection(90.0f);
+
+    Matrix4f finalMatrix = projection * transform;
+
+    glUniformMatrix4fv(gTransformMatrix, 1, GL_TRUE, &finalMatrix.m[0][0]);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
@@ -39,7 +63,7 @@ static void RenderSceneCB(){
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void *)(3 * sizeof(float)));
 
-    glDrawElements(GL_TRIANGLES, 18 * 3, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 6 * 2 * 3, GL_UNSIGNED_INT, 0);
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
@@ -50,32 +74,19 @@ static void RenderSceneCB(){
 
 static void CreateVertexBuffer(){
     glEnable(GL_CULL_FACE);
-    //glFrontFace(GL_CW);
-    //glCullFace(GL_FRONT);
+    glFrontFace(GL_CW); //Because default Blender is CW
+    glCullFace(GL_BACK);
 
-    Vertex vertices[19];
+    Vertex vertices[8];
 
-    vertices[0] = Vertex(Vector3f(0.0f, 0.0f)); //Center
-
-    vertices[1] = Vertex(Vector3f(-1.00f, 1.0f));
-    vertices[2] = Vertex(Vector3f(-0.75f, 1.0f));
-    vertices[3] = Vertex(Vector3f(-0.50f, 1.0f));
-    vertices[4] = Vertex(Vector3f(-0.25f, 1.0f));
-    vertices[5] = Vertex(Vector3f( 0.00f, 1.0f));
-    vertices[6] = Vertex(Vector3f( 0.25f, 1.0f));
-    vertices[7] = Vertex(Vector3f( 0.50f, 1.0f));
-    vertices[8] = Vertex(Vector3f( 0.75f, 1.0f));
-    vertices[9] = Vertex(Vector3f( 1.00f, 1.0f));
-
-    vertices[10] = Vertex(Vector3f(-1.00f, -1.0f));
-    vertices[11] = Vertex(Vector3f(-0.75f, -1.0f));
-    vertices[12] = Vertex(Vector3f(-0.50f, -1.0f));
-    vertices[13] = Vertex(Vector3f(-0.25f, -1.0f));
-    vertices[14] = Vertex(Vector3f( 0.00f, -1.0f));
-    vertices[15] = Vertex(Vector3f( 0.25f, -1.0f));
-    vertices[16] = Vertex(Vector3f( 0.50f, -1.0f));
-    vertices[17] = Vertex(Vector3f( 0.75f, -1.0f));
-    vertices[18] = Vertex(Vector3f( 1.00f, -1.0f));
+    vertices[0] = Vertex(Vector3f( 0.5f,  0.5f,  0.5f));
+    vertices[1] = Vertex(Vector3f( 0.5f,  0.5f, -0.5f));
+    vertices[2] = Vertex(Vector3f( 0.5f, -0.5f,  0.5f));
+    vertices[3] = Vertex(Vector3f( 0.5f, -0.5f, -0.5f));
+    vertices[4] = Vertex(Vector3f(-0.5f,  0.5f,  0.5f));
+    vertices[5] = Vertex(Vector3f(-0.5f,  0.5f, -0.5f));
+    vertices[6] = Vertex(Vector3f(-0.5f, -0.5f,  0.5f));
+    vertices[7] = Vertex(Vector3f(-0.5f, -0.5f, -0.5f));
 
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -85,28 +96,18 @@ static void CreateVertexBuffer(){
 static void CreateIndexBuffer(){
     unsigned int indices[] = {
         //Top Triangles
-        0,2,1,
-        0,3,2,
-        0,4,3,
         0,5,4,
-        0,6,5,
-        0,7,6,
-        0,8,7,
-        0,9,8,
-
-        //Bottom Triangle
-        0,10,11,
-        0,11,12,
-        0,12,13,
-        0,13,14,
-        0,14,15,
-        0,15,16,
-        0,16,17,
-        0,17,18,
-
-        //Side Triangles
-        0,1,10,
-        0,18,9
+        5,3,7,
+        1,2,3,
+        6,3,2,
+        4,7,6,
+        0,6,2,
+        0,1,5,
+        5,1,3,
+        1,0,2,
+        6,7,3,
+        4,5,7,
+        0,4,6,
     };
 
     glGenBuffers(1, &indexBuffer);
@@ -183,8 +184,8 @@ static void CompileShaders(){
         exit(1);
     }
 
-    gTransformLocation = glGetUniformLocation(shaderProgramHandle, "gTransform");
-    if(gTransformLocation == -1){
+    gTransformMatrix = glGetUniformLocation(shaderProgramHandle, "gTransform");
+    if(gTransformMatrix == -1){
         fprintf(stderr, "Error while fetching uniform location of %s\n", "gTransform");
         getchar();
         exit(1);
@@ -210,12 +211,12 @@ int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
 
-    int width = 1200;
-    int height = 800;
+    int width = 900;
+    int height = 900;
     glutInitWindowSize(width, height);
 
-    int x = (2560/2)-(1200/2);
-    int y = (1080/2)-(800/2);
+    int x = (2560/2)-(width/2);
+    int y = (1080/2)-(height/2);
     glutInitWindowPosition(x, y);
 
     int winID = glutCreateWindow("OpenGL Learning");
