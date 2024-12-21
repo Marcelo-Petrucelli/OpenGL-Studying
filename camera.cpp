@@ -50,7 +50,7 @@ void Camera::onKeyboard(unsigned char _key){
 
         case GLUT_KEY_LEFT:
             {
-                Vector3f left = up.cross(front);
+                Vector3f left = front.cross(up);
                 left.normalize();
                 position += (left * speed);
             }
@@ -58,7 +58,7 @@ void Camera::onKeyboard(unsigned char _key){
 
         case GLUT_KEY_RIGHT:
             {
-                Vector3f right = front.cross(up);
+                Vector3f right = up.cross(front);
                 right.normalize();
                 position += (right * speed);
             }
@@ -93,5 +93,5 @@ Matrix4f Camera::getMatrix(){
 
     ViewMatrix view(position, u, v, front);
 
-    return projection; // * view
+    return projection * view;
 }

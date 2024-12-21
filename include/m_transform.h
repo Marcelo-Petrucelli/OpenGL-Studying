@@ -26,7 +26,7 @@ class Transform {
 };
 
 struct ScaleMatrix : Matrix4f {
-    ScaleMatrix(Vector3f scale) : Matrix4f(
+    ScaleMatrix(Vector3f& scale) : Matrix4f(
         scale.x, 0.0f, 0.0f, 0.0f,
         0.0f, scale.y, 0.0f, 0.0f,
         0.0f, 0.0f, scale.z, 0.0f,
@@ -62,7 +62,7 @@ struct RotationZMatrix : Matrix4f {
 };
 
 struct TranslationMatrix : Matrix4f {
-    TranslationMatrix(Vector3f translation) : Matrix4f(
+    TranslationMatrix(Vector3f& translation) : Matrix4f(
         1.0f, 0.0f, 0.0f, translation.x,
         0.0f, 1.0f, 0.0f, translation.y,
         0.0f, 0.0f, 1.0f, translation.z,

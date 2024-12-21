@@ -5,15 +5,12 @@ TempGraphicsData graphicsData;
 static void RenderSceneCB(){
     glClear(GL_COLOR_BUFFER_BIT);
 
-    Camera cam = *(graphicsData.camera);
-    Transform trans = *(graphicsData.transform);
+    Matrix4f cameraMatrix = (*(graphicsData.camera)).getMatrix();
 
-    Matrix4f cameraMatrix = cam.getMatrix();
+    (*(graphicsData.transform)).setPosition(Vector3f(0.0f, 0.0f, 3.0f));
+    (*(graphicsData.transform)).rotateBy(Vector3f(0.0f, 1.0f, 0.0f));
 
-    trans.setPosition(Vector3f(0.0f, 0.0f, 3.0f));
-    trans.rotateBy(Vector3f(0.0f, 1.0f, 0.0f));
-
-    Matrix4f objectTransformMatrix = trans.getMatrix();
+    Matrix4f objectTransformMatrix = (*(graphicsData.transform)).getMatrix();
     
     Matrix4f WVP = cameraMatrix * objectTransformMatrix;
 
@@ -38,13 +35,11 @@ static void RenderSceneCB(){
 }
 
 static void KeyboardCB(unsigned char key, int mouse_x, int mouse_y){
-    Camera cam = *(graphicsData.camera);
-    cam.onKeyboard(key);
+    (*(graphicsData.camera)).onKeyboard(key);
 }
 
 static void SpecialKeyboardCB(int key, int mouse_x, int mouse_y){
-    Camera cam = *(graphicsData.camera);
-    cam.onKeyboard(key);
+    (*(graphicsData.camera)).onKeyboard(key);
 }
 
 int main(int argc, char **argv) {

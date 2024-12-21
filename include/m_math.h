@@ -105,36 +105,36 @@ struct Vector3f {
         z = z*invMod;
     }
 
-    inline Vector3f operator + (const Vector3f& other) const {
+    inline Vector3f& operator + (const Vector3f& other) const {
         Vector3f result(*this);  // Copy.
         return result += other;
     }
 
-    inline Vector3f operator += (const Vector3f& other) {
+    inline Vector3f& operator += (const Vector3f& other) {
         x += other.x;
         y += other.y;
         z += other.z;
         return *this;
     }
 
-    inline Vector3f operator - (const Vector3f& other) const {
+    inline Vector3f& operator - (const Vector3f& other) const {
         Vector3f result(*this);  // Copy.
         return result -= other;
     }
 
-    inline Vector3f operator -= (const Vector3f& other) {
+    inline Vector3f& operator -= (const Vector3f& other) {
         x -= other.x;
         y -= other.y;
         z -= other.z;
         return *this;
     }
 
-    inline Vector3f operator * (const float scalar) const {
+    inline Vector3f& operator * (const float scalar) const {
         Vector3f result(*this);  // Copy.
         return result *= scalar;
     }
 
-    inline Vector3f operator *= (const float scalar) {
+    inline Vector3f& operator *= (const float scalar) {
         x *= scalar;
         y *= scalar;
         z *= scalar;
