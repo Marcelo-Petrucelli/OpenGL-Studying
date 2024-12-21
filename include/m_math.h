@@ -1,5 +1,4 @@
-#ifndef DEV_MATH_H
-#define DEV_MATH_H
+#pragma once
 
 #define _USE_MATH_DEFINES
 #include <cstdint>
@@ -252,5 +251,3 @@ struct Matrix4f {
         return ret;
     }
 };
-
-#endif

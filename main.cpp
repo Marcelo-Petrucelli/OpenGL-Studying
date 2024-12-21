@@ -42,21 +42,36 @@ static void SpecialKeyboardCB(int key, int mouse_x, int mouse_y){
     (*(graphicsData.camera)).onKeyboard(key);
 }
 
+static float InitGlutWindow(const char* windowName, Vector2f size = Vector2f(-1.0f, -1.0f)){
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
+
+    if(size.x == -1.0f && size.y == -1.0f){
+        size.x = glutGet(GLUT_SCREEN_WIDTH); //Forces x to be 0 below
+        size.y = glutGet(GLUT_SCREEN_HEIGHT); //Forces y to be 0 below
+    }
+
+    glutInitWindowSize(size.x, size.y);
+
+    int x = (glutGet(GLUT_SCREEN_WIDTH)/2)-(size.x/2);
+    int y = (glutGet(GLUT_SCREEN_HEIGHT)/2)-(size.y/2);
+    glutInitWindowPosition(x, y);
+
+    int winID = glutCreateWindow("OpenGL Learning");
+    return size.x/size.y;
+}
+
+static void InitGlutCallbacks(){
+    glutDisplayFunc(RenderSceneCB);
+    glutKeyboardFunc(KeyboardCB);
+    glutSpecialFunc(SpecialKeyboardCB);
+}
+
 int main(int argc, char **argv) {
     srand(getpid());
 
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
-
-    float width = 1500.0f;
-    float height = 900.0f;
-    glutInitWindowSize(width, height);
-
-    int x = (2560/2)-(width/2);
-    int y = (1080/2)-(height/2);
-    glutInitWindowPosition(x, y);
-
-    int winID = glutCreateWindow("OpenGL Learning");
+    float aspectRatio = InitGlutWindow("OpenGL Learning", Vector2f(1500, 900));
+    InitGlutCallbacks();
 
     GLenum res = glewInit();
     if (res != GLEW_OK) {
@@ -69,7 +84,7 @@ int main(int argc, char **argv) {
     glClearColor(Red, Green, Blue, Alpha);
 
     Camera cam = Camera(
-        width/height,
+        aspectRatio,
         Vector3f(0.0f, 0.0f, -1.0f),
         Vector2f(90.0f, 90.0f),
         Vector2f(1.0f, 10.0f),
@@ -78,24 +93,15 @@ int main(int argc, char **argv) {
     Transform trans = Transform();
     graphicsData = TempGraphicsData(&cam, &trans);
 
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW); //Because default Blender is CW
+    glCullFace(GL_BACK);
+    
     CreateVertexBuffer(&graphicsData);
     CreateIndexBuffer(&graphicsData);
 
     CompileShaders(&graphicsData);
 
-    glutDisplayFunc(RenderSceneCB);
-    glutKeyboardFunc(KeyboardCB);
-    glutSpecialFunc(SpecialKeyboardCB);
-
     glutMainLoop();
-
-    /*GLenum err = glewInit();
-    if (GLEW_OK != err) {
-        // Problem: glewInit failed, something is seriously wrong.
-        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-    }
-    fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
-    getchar();*/
-
     return 0;
 }

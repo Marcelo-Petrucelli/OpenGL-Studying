@@ -91,7 +91,8 @@ Matrix4f Camera::getMatrix(){
     Vector3f v = front.cross(u);
     v.normalize();
 
-    ViewMatrix view(position, u, v, front);
+    TranslationMatrix cameraTranslation(position * -1);
+    ViewMatrix view(u, v, front);
 
-    return projection * view;
+    return projection * (view * cameraTranslation);
 }

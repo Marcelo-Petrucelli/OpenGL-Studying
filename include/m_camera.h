@@ -1,13 +1,6 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
 
 #include "m_graphics.h"
-
-#define InverseHalfFov(f) (float)(1.0f / tanf(ToRadian(f / 2.0f)))
-#define ZFrustonTransformRange(nZ, fZ) (float)(nZ - fZ)
-
-#define ProjectionA(nZ, fZ) (float)((- fZ - nZ) / ZFrustonTransformRange(nZ, fZ))
-#define ProjectionB(nZ, fZ) (float)((2 * nZ * fZ) / ZFrustonTransformRange(nZ, fZ))
 
 struct DefaultUpVector : Vector3f {
     DefaultUpVector() : Vector3f(0.0f, 1.0f, 0.0f) {}
@@ -58,23 +51,3 @@ class Camera {
         float ratio;
         Vector2f nearFar;
 };
-
-struct ViewMatrix : Matrix4f {
-    ViewMatrix(Vector3f& pos, Vector3f& u, Vector3f& v, Vector3f& n) : Matrix4f(
-        u.x, u.y, u.z, -pos.x,
-        v.x, v.y, v.z, -pos.y,
-        n.x, n.y, n.z, -pos.z,
-        0.0f, 0.0f, 0.0f, 1.0f
-    ){}
-};
-
-struct PerspectiveProjectionMatrix : Matrix4f {
-    PerspectiveProjectionMatrix(Vector2f& fov, float rasterRatio, Vector2f& nearFar) : Matrix4f(
-        InverseHalfFov(fov.x) / rasterRatio, 0.0f, 0.0f, 0.0f,
-        0.0f, InverseHalfFov(fov.y), 0.0f, 0.0f,
-        0.0f, 0.0f, ProjectionA(nearFar.x, nearFar.y), ProjectionB(nearFar.x, nearFar.y),
-        0.0f, 0.0f, 1.0f, 0.0f
-    ){}
-};
-
-#endif
