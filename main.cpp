@@ -5,6 +5,7 @@ TempGraphicsData graphicsData;
 static void RenderSceneCB(){
     glClear(GL_COLOR_BUFFER_BIT);
 
+    (*(graphicsData.camera)).onRender();
     Matrix4f cameraMatrix = (*(graphicsData.camera)).getMatrix();
 
     (*(graphicsData.transform)).setPosition(Vector3f(0.0f, 0.0f, 3.0f));
@@ -42,21 +43,36 @@ static void SpecialKeyboardCB(int key, int mouse_x, int mouse_y){
     (*(graphicsData.camera)).onKeyboard(key);
 }
 
-static float InitGlutWindow(const char* windowName, Vector2f size = Vector2f(-1.0f, -1.0f)){
+static void MouseMoveCB(int mouse_x, int mouse_y){
+    (*(graphicsData.camera)).onMouse(mouse_x, mouse_y);
+}
+
+static float InitGlutWindow(const char* windowName, Vector2f size = Vector2f(-1.0f, -1.0f), bool fullScreen = false){
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
 
+    int deviceScreenWidth = glutGet(GLUT_SCREEN_WIDTH);
+    int deviceScreenHeight = glutGet(GLUT_SCREEN_HEIGHT);
+
     if(size.x == -1.0f && size.y == -1.0f){
-        size.x = glutGet(GLUT_SCREEN_WIDTH); //Forces x to be 0 below
-        size.y = glutGet(GLUT_SCREEN_HEIGHT); //Forces y to be 0 below
+        size.x = deviceScreenWidth; //Forces x to be 0 below
+        size.y = deviceScreenHeight; //Forces y to be 0 below
     }
 
     glutInitWindowSize(size.x, size.y);
 
-    int x = (glutGet(GLUT_SCREEN_WIDTH)/2)-(size.x/2);
-    int y = (glutGet(GLUT_SCREEN_HEIGHT)/2)-(size.y/2);
+    int x = (deviceScreenWidth/2)-(size.x/2);
+    int y = (deviceScreenHeight/2)-(size.y/2);
     glutInitWindowPosition(x, y);
 
     int winID = glutCreateWindow("OpenGL Learning");
+
+    if(fullScreen){
+        char gameModeString[64];
+        snprintf(gameModeString, sizeof(gameModeString), "%dx%d@32", deviceScreenWidth, deviceScreenHeight);
+        glutGameModeString(gameModeString);
+        glutEnterGameMode();
+    }
+
     return size.x/size.y;
 }
 
@@ -64,6 +80,8 @@ static void InitGlutCallbacks(){
     glutDisplayFunc(RenderSceneCB);
     glutKeyboardFunc(KeyboardCB);
     glutSpecialFunc(SpecialKeyboardCB);
+    glutPassiveMotionFunc(MouseMoveCB);
+    glutMotionFunc(MouseMoveCB);
 }
 
 int main(int argc, char **argv) {

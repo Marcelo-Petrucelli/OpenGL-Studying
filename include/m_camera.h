@@ -37,7 +37,9 @@ class Camera {
         void setSpeed(float);
 
         void lookAt(Vector3f, Vector3f);
+        void onRender();
         void onKeyboard(unsigned char);
+        void onMouse(int, int);
 
         virtual Matrix4f getMatrix();
     

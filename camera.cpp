@@ -34,6 +34,10 @@ void Camera::lookAt(Vector3f, Vector3f){
 
 }
 
+void Camera::onRender(){
+    
+}
+
 void Camera::onKeyboard(unsigned char _key){
     switch(_key){
         case GLUT_KEY_PAGE_UP:
@@ -76,6 +80,10 @@ void Camera::onKeyboard(unsigned char _key){
             }
         break;
     }
+}
+
+void Camera::onMouse(int x, int y){
+    
 }
 
 
