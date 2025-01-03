@@ -250,4 +250,13 @@ struct Matrix4f {
 
         return ret;
     }
+
+    static Matrix4f identity(){
+        Matrix4f ret = Matrix4f();
+        ret.m[0][0] = 1;
+        ret.m[1][1] = 1;
+        ret.m[2][2] = 1;
+        ret.m[3][3] = 1;
+        return ret;
+    }
 };

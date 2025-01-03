@@ -11,9 +11,9 @@ static void RenderSceneCB(){
     graphicsData.transform->setPosition(Vector3f(0.0f, 0.0f, 3.0f));
     graphicsData.transform->rotateBy(Vector3f(0.0f, 1.0f, 0.0f));
 
-    Matrix4f objectTransformMatrix = graphicsData.transform->getMatrix();
+    Matrix4f worldTransformMatrix = graphicsData.transform->getMatrix();
     
-    Matrix4f WVP = cameraMatrix * objectTransformMatrix;
+    Matrix4f WVP = cameraMatrix * worldTransformMatrix;
 
     glUniformMatrix4fv(graphicsData.gUniformTransformMatrixID, 1, GL_TRUE, &WVP.m[0][0]);
 
@@ -31,13 +31,13 @@ static void RenderSceneCB(){
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
 
-    //glutPostRedisplay();
     glfwSwapBuffers(graphicsData.window);
     glfwPollEvents(); /* Poll for and process events */
 }
 
 static void FrameBufferSizeCallback(GLFWwindow* window, int width, int height){
     glViewport(0, 0, width, height);
+    graphicsData.camera->setScreenRatio((float)width/(float)height);
 }
 
 static void KeyboardCB(GLFWwindow* window, int key, int scancode, int action, int mods){
@@ -48,7 +48,7 @@ static void MouseMoveCB(GLFWwindow* window, double mouse_x, double mouse_y){
     graphicsData.camera->onMouse(mouse_x, mouse_y);
 }
 
-static int InitGLFWWindow(const char* windowName, Vector2f size = Vector2f(-1.0f, -1.0f), bool fullScreen = false){
+static GLFWwindow* InitGLFWWindow(const char* windowName, Vector2f size = Vector2f(-1.0f, -1.0f), bool fullScreen = false){
     GLFWmonitor* mainMonitor = glfwGetPrimaryMonitor();
 
     const GLFWvidmode * mode = glfwGetVideoMode(mainMonitor);
@@ -79,7 +79,7 @@ static int InitGLFWWindow(const char* windowName, Vector2f size = Vector2f(-1.0f
     GLFWwindow* window = glfwCreateWindow(size.x, size.y, windowName, NULL, NULL);
     if (!window) {
         glfwTerminate();
-        return -1;
+        return NULL;
     }
 
     //glfwSetWindowAttrib(window, GLFW_RESIZABLE, GLFW_FALSE);
@@ -93,18 +93,8 @@ static int InitGLFWWindow(const char* windowName, Vector2f size = Vector2f(-1.0f
     glfwSetWindowIcon(window, 2, images);*/
 
     glfwMakeContextCurrent(window);
-
-    Camera cam = Camera(
-        size.x/size.y,
-        Vector3f(0.0f, 0.0f, -1.0f),
-        Vector2f(90.0f, 90.0f),
-        Vector2f(1.0f, 10.0f),
-        1.0f
-    );
-    Transform trans = Transform();
-    graphicsData = TempGraphicsData(window, &cam, &trans);
-
-    return 0;
+    glfwSwapInterval(1);
+    return window;
 }
 
 static void InitGLFWCallbacks(){
@@ -122,10 +112,13 @@ int main(int argc, char **argv) {
     srand(getpid());
 
     if (!glfwInit()){
+        fprintf(stderr, "GLFWInit() Failed!\n");
         return -1;
     }
 
-    if (InitGLFWWindow("OpenGL Learning", Vector2f(1500, 900)) != 0){
+    GLFWwindow* window = InitGLFWWindow("OpenGL Learning", Vector2f(1500, 900));
+    if (!window){
+        fprintf(stderr, "InitGLFWWindow() Failed!\n");
         return -1;
     }
 
@@ -140,10 +133,23 @@ int main(int argc, char **argv) {
     GLclampf Red = 0.0f, Blue = 0.0f, Green = 0.0f, Alpha = 0.0f;
     glClearColor(Red, Green, Blue, Alpha);
 
-    /*glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW); //Because default Blender is CW
-    glCullFace(GL_BACK);*/
+    glCullFace(GL_BACK);
     
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+
+    Camera cam = Camera(
+        (float)width / (float)height,
+        Vector3f(0.0f, 0.0f, -1.0f),
+        Vector2f(90.0f, 90.0f),
+        Vector2f(1.0f, 10.0f),
+        1.0f
+    );
+    Transform trans = Transform();
+    graphicsData = TempGraphicsData(window, &cam, &trans);
+
     CreateVertexBuffer(&graphicsData);
     CreateIndexBuffer(&graphicsData);
 

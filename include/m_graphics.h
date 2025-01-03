@@ -8,8 +8,8 @@
 #define InverseHalfFov(f) (float)(1.0f / tanf(ToRadian(f / 2.0f)))
 #define ZFrustonTransformRange(nZ, fZ) (float)(nZ - fZ)
 
-#define ProjectionA(nZ, fZ) (float)((- fZ - nZ) / ZFrustonTransformRange(nZ, fZ))
-#define ProjectionB(nZ, fZ) (float)((2 * nZ * fZ) / ZFrustonTransformRange(nZ, fZ))
+#define ProjectionZA(nZ, fZ) (float)((- fZ - nZ) / ZFrustonTransformRange(nZ, fZ))
+#define ProjectionZB(nZ, fZ) (float)((2 * nZ * fZ) / ZFrustonTransformRange(nZ, fZ))
 
 static const char* vertexShaderFileName = "shaders/shader.vs";
 static const char* fragmentShaderFileName = "shaders/shader.fs";
@@ -157,7 +157,7 @@ struct PerspectiveProjectionMatrix : Matrix4f {
     PerspectiveProjectionMatrix(Vector2f& fov, float rasterRatio, Vector2f& nearFar) : Matrix4f(
         InverseHalfFov(fov.x) / rasterRatio, 0.0f, 0.0f, 0.0f,
         0.0f, InverseHalfFov(fov.y), 0.0f, 0.0f,
-        0.0f, 0.0f, ProjectionA(nearFar.x, nearFar.y), ProjectionB(nearFar.x, nearFar.y),
+        0.0f, 0.0f, ProjectionZA(nearFar.x, nearFar.y), ProjectionZB(nearFar.x, nearFar.y),
         0.0f, 0.0f, 1.0f, 0.0f
     ){}
 };
