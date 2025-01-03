@@ -38,10 +38,10 @@ class Camera {
 
         void lookAt(Vector3f, Vector3f);
         void onRender();
-        void onKeyboard(unsigned char);
+        void onKeyboard(int);
         void onMouse(int, int);
 
-        virtual Matrix4f getMatrix();
+        Matrix4f getMatrix();
     
     private:
         Vector3f position;

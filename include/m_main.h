@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <GL/glew.h>
-#include <GL/freeglut.h>
+#include <GLFW/glfw3.h>
 
 #include "m_camera.h"
 #include "m_transform.h"
@@ -14,11 +14,13 @@
 class TempGraphicsData {
     public:
         TempGraphicsData(){}
-        TempGraphicsData(Camera* _camera, Transform* _transform){
+        TempGraphicsData(GLFWwindow* _window, Camera* _camera, Transform* _transform) {
+            window = _window;
             camera = _camera;
             transform = _transform;
         }
 
+        GLFWwindow* window;
         Camera* camera;
         Transform* transform;
 

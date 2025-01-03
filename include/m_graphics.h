@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <GL/glew.h>
-#include <GL/freeglut.h>
+#include <GLFW/glfw3.h>
 #include "m_math.h"
 
 #define InverseHalfFov(f) (float)(1.0f / tanf(ToRadian(f / 2.0f)))
@@ -54,8 +54,10 @@ struct UnitQuaternion : Vector4f {
     float theta;
     Vector3f normal;
 
-    UnitQuaternion(Vector3f _normal, float _theta = 0.0f){
-        normal = _normal;
+    UnitQuaternion(Vector3f _point) : UnitQuaternion(_point, 0.0f) {}
+
+    UnitQuaternion(Vector3f _axis, float _theta){
+        normal = _axis;
         theta = _theta;
 
         float cosHalfT = cosf(theta/2.0f);
@@ -69,7 +71,7 @@ struct UnitQuaternion : Vector4f {
         w = cosHalfT;
     }
 
-    UnitQuaternion conjugate () {
+    UnitQuaternion conjugate () const {
         //Could be:
         //return Quaternion(this->normal * -1, this->theta);
         UnitQuaternion result(*this); //This seems faster
@@ -77,6 +79,11 @@ struct UnitQuaternion : Vector4f {
         result.y *= -1;
         result.z *= -1;
         return result;
+    }
+
+    UnitQuaternion rotate(Vector3f _axis, float _theta) {
+        const UnitQuaternion q = UnitQuaternion(_axis, _theta);
+        return q * (*this) * (q.conjugate());
     }
 
     inline UnitQuaternion operator * (const UnitQuaternion& other) const {

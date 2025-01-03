@@ -38,21 +38,21 @@ void Camera::onRender(){
     
 }
 
-void Camera::onKeyboard(unsigned char _key){
+void Camera::onKeyboard(int _key){
     switch(_key){
-        case GLUT_KEY_PAGE_UP:
+        case GLFW_KEY_PAGE_UP:
             {
                 position += (front * speed);
             }
         break;
 
-        case GLUT_KEY_PAGE_DOWN:
+        case GLFW_KEY_PAGE_DOWN:
             {
                 position -= (front * speed);
             }
         break;
 
-        case GLUT_KEY_LEFT:
+        case GLFW_KEY_LEFT:
             {
                 Vector3f left = front.cross(up);
                 left.normalize();
@@ -60,7 +60,7 @@ void Camera::onKeyboard(unsigned char _key){
             }
         break;
 
-        case GLUT_KEY_RIGHT:
+        case GLFW_KEY_RIGHT:
             {
                 Vector3f right = up.cross(front);
                 right.normalize();
@@ -68,13 +68,13 @@ void Camera::onKeyboard(unsigned char _key){
             }
         break;
 
-        case GLUT_KEY_UP:
+        case GLFW_KEY_UP:
             {
                 position.y += speed;
             }
         break;
 
-        case GLUT_KEY_DOWN:
+        case GLFW_KEY_DOWN:
             {
                 position.y -= speed;
             }
