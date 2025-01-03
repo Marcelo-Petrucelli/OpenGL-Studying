@@ -26,7 +26,7 @@ void Transform::scaleBy(Vector3f _scaleBy){
 };
 
 
-Matrix4f Transform::getMatrix() {
+void Transform::getMatrix(Matrix4f* ret) {
     ScaleMatrix scaleMatrix(scale);
 
     RotationXMatrix rotateXMatrix(rotation.x);
@@ -35,5 +35,5 @@ Matrix4f Transform::getMatrix() {
 
     TranslationMatrix translateMatrix(position);
 
-    return translateMatrix * rotateXMatrix * rotateYMatrix * rotateZMatrix * scaleMatrix;
+    *ret = translateMatrix * rotateXMatrix * rotateYMatrix * rotateZMatrix * scaleMatrix;
 }

@@ -16,7 +16,7 @@ class Transform {
         void rotateBy(Vector3f);
         void scaleBy(Vector3f);
 
-        Matrix4f getMatrix();
+        void getMatrix(Matrix4f*);
     
     private:
         Vector3f position;

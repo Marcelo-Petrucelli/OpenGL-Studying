@@ -41,7 +41,7 @@ class Camera {
         void onKeyboard(int);
         void onMouse(int, int);
 
-        Matrix4f getMatrix();
+        void getMatrix(Matrix4f*);
     
     private:
         Vector3f position;

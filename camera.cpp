@@ -87,7 +87,7 @@ void Camera::onMouse(int x, int y){
 }
 
 
-Matrix4f Camera::getMatrix(){
+void Camera::getMatrix(Matrix4f* ret){
     PerspectiveProjectionMatrix projection(fov, ratio, nearFar);
 
     front.normalize();
@@ -102,5 +102,5 @@ Matrix4f Camera::getMatrix(){
     TranslationMatrix cameraTranslation(position * -1);
     ViewMatrix view(u, v, front);
 
-    return projection * (view * cameraTranslation);
+    *ret = projection * (view * cameraTranslation);
 }

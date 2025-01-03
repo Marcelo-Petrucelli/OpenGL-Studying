@@ -6,12 +6,14 @@ static void RenderSceneCB(){
     glClear(GL_COLOR_BUFFER_BIT);
 
     graphicsData.camera->onRender();
-    Matrix4f cameraMatrix = graphicsData.camera->getMatrix();
+    Matrix4f cameraMatrix;
+    graphicsData.camera->getMatrix(&cameraMatrix);
 
     graphicsData.transform->setPosition(Vector3f(0.0f, 0.0f, 3.0f));
     graphicsData.transform->rotateBy(Vector3f(0.0f, 1.0f, 0.0f));
 
-    Matrix4f worldTransformMatrix = graphicsData.transform->getMatrix();
+    Matrix4f worldTransformMatrix;
+    graphicsData.transform->getMatrix(&worldTransformMatrix);
     
     Matrix4f WVP = cameraMatrix * worldTransformMatrix;
 
